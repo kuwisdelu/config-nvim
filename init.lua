@@ -19,14 +19,14 @@ do
 	-- Line display
 	vim.o.cursorline = true
 	vim.o.breakindent = true
-	vim.o.signcolumn = 'yes'
+	vim.o.signcolumn = "yes"
 	vim.o.scrolloff = 10
 	vim.o.list = true
-	vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+	vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 	-- Mouse mode
-	vim.o.mouse = 'a'
+	vim.o.mouse = "a"
 	-- Sync OS clipboard
-	vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
+	vim.schedule(function() vim.o.clipboard = "unnamedplus" end)
 	-- Undo and confirm changes
 	vim.o.undofile = true
 	vim.o.confirm = true
@@ -37,7 +37,7 @@ do
 	vim.o.splitright = true
 	vim.o.splitbelow = true
 	-- Live substitutions
-	vim.o.inccommand = 'split'
+	vim.o.inccommand = "split"
 end
 
 -- =======
@@ -45,21 +45,21 @@ end
 -- =======
 do
 	-- Leader and localleader keys
-	vim.g.mapleader = ' '
-	vim.g.maplocalleader = ' '
+	vim.g.mapleader = " "
+	vim.g.maplocalleader = " "
 	-- Clear search highlights on Esc
-	vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+	vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 	-- Create a new tab
-	vim.keymap.set('n', '<leader>t', '<cmd>tabnew<CR>', { desc = 'New [T]ab' })
+	vim.keymap.set("n", "<leader>t", "<cmd>tabnew<CR>", { desc = "New [T]ab" })
 	-- Easy exit terminal
-	vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
+	vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 	-- Easy split navigation
-	vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-	vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-	vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-	vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+	vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to the left window" })
+	vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right window" })
+	vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
+	vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
 	-- Briefly highlight yanked text
-	vim.api.nvim_create_autocmd('TextYankPost', {
+	vim.api.nvim_create_autocmd("TextYankPost", {
 		desc = "Briefly highlight yanked test",
 		callback = function() vim.hl.on_yank() end,
 	})
@@ -69,12 +69,36 @@ end
 -- PLUGINS
 -- =======
 -- Helper function for Github repos
-local function gh(repo) return 'https://github.com/' .. repo end
+local function gh(repo) return "https://github.com/" .. repo end
 do
-	-- Guess indentation settings
-	vim.pack.add { gh 'NMAC427/guess-indent.nvim' }
-	require('guess-indent').setup {}
+	-- Guess indentation
+	vim.pack.add { gh "NMAC427/guess-indent.nvim" }
+	require("guess-indent").setup {}
 	-- Git signs
-	vim.pack.add { gh 'lewis6991/gitsigns.nvim' }
-	require('gitsigns')
+	vim.pack.add { gh "lewis6991/gitsigns.nvim" }
+	require("gitsigns")
+	-- Display keymaps
+	vim.pack.add { gh "folke/which-key.nvim" }
+	require("which-key").setup {
+		delay = 0,
+	}
+	-- Colorscheme
+	vim.pack.add { gh "folke/tokyonight.nvim" }
+	require("tokyonight").setup {}
+	vim.cmd.colorscheme "tokyonight-night"
+	-- TODO: highlight comments
+	vim.pack.add { gh "folke/todo-comments.nvim" }
+	require("todo-comments").setup { signs = false }
+	-- MINI.NVIM
+	vim.pack.add { gh "nvim-mini/mini.nvim" }
+	require("mini.icons").setup {}
+	require("mini.ai").setup {
+		mappings = {
+			around_next = "aa",
+			inside_next = "ii",
+		},
+		n_lines = 500,
+	}
+	require("mini.surround").setup {}
+	require("mini.statusline").setup {}
 end
