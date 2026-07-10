@@ -2,7 +2,7 @@
 -- NEOVIM CONFIG
 -- by kuwisdelu
 -- =============
--- NOTE: requires ripgrep, fd, fzf
+-- NOTE: requires ripgrep, fd, fzf, tree-sitter-cli
 
 -- =======
 -- OPTIONS
@@ -114,6 +114,44 @@ do
 	require("mini.ai").setup {}
 	require("mini.surround").setup {}
 	require("mini.statusline").setup {}
+end
+
+-- ======
+-- PARSER
+-- ======
+do
+	vim.pack.add { gh "nvim-treesitter/nvim-treesitter" }
+	local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 
+		'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
+	require("nvim-treesitter").install(parsers)
+	local available = require("nvim-treesitter").get_available()
+	-- Try attaching parser
+	local function treesitter_try_attach(buf, language)
+		if not vim.treesitter.language.add(language) then return end
+		vim.treesitter.start(buf, language)
+	end
+	-- Tree installing and attaching parser
+	local function treesitter_try_install_attach(buf, language)
+		require("tree-sitter").install(language):await(
+			function() treesitter_try_attach(buf, language) end)
+	end
+	vim.api.nvim_create_autocmd("FileType", {
+		callback = function(args)
+			local buf, filetype = args.buf, args.match
+			local language = vim.treesitter.language.get_lang(filetype)
+			if not language then
+				return
+			end
+			local installed = require("nvim-treesitter").get_installed "parsers"
+			if vim.tbl_contains(installed, language) then
+				treesitter_try_attach(buf, language)
+			elseif vim.tbl_contains(available, language) then
+				treesitter_try_install_attach(buf, language)
+			else
+				treesitter_try_attach(buf, language)
+			end
+		end
+	})
 end
 
 -- ======
