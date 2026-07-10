@@ -195,8 +195,8 @@ do
 	vim.pack.add { gh "jpalardy/vim-slime" }
 	vim.keymap.set("x", "<leader>r", "<Plug>SlimeRegionSend",
 		{ desc = "[R]un region" })
-	vim.keymap.set("n", "<leader>r", "<Plug>SlimeLineSend",
-		{ desc = "[R]un lines" })
+	vim.keymap.set("n", "<leader>r", "<Plug>SlimeLineSend<CR>",
+		{ desc = "[R]un line" })
 	vim.keymap.set("n", "<leader>m", "<Plug>SlimeMotionSend",
 		{ desc = "Run [M]otion" })
 	vim.keymap.set("n", "<leader>p", "<Plug>SlimeParagraphSend",
