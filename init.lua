@@ -1,3 +1,9 @@
+-- =============
+-- NEOVIM CONFIG
+-- by kuwisdelu
+-- =============
+-- NOTE: requires ripgrep, fd, fzf
+
 -- =======
 -- OPTIONS
 -- =======
