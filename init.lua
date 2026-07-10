@@ -12,11 +12,14 @@ do
 	vim.loader.enable()		
 	-- Font settings
 	vim.g.have_nerd_font = false
+	-- Filetype plugin
+	vim.cmd("filetype plugin on")
+	vim.cmd("filetype indent off")
 	-- Indentation settings
 	vim.o.expandtab = false
 	vim.o.tabstop = 4
-	vim.o.shiftwidth = 0
-	vim.o.softtabstop = -1
+	vim.o.shiftwidth = 4
+	vim.o.softtabstop = 0
 	-- Language settings
 	vim.g.python_recommended_style = 0
 	-- Line numbering
@@ -190,8 +193,19 @@ do
 		vim.keymap.set("n", "<leader>fa", function()
 			require("telescope").extensions.live_grep_args.live_grep_args() end,
 			{ desc = "[F]ind by Grep with [A]rgs" })
-		vim.keymap.set("n", "<leader>f/", builtin.current_buffer_fuzzy_find,
-			{ desc = "[F]ind fuzzily in current buffer" })
+		vim.keymap.set("n", "<leader>f/", function()
+			builtin.live_grep {
+				grep_open_files = true,
+				prompt_title = "Live Grep in Open Buffers"
+			} end,
+			{ desc = "[F]ind by Grep in Buffers" })
+		vim.keymap.set("n", "<leader>/", function()
+			builtin.current_buffer_fuzzy_find(
+				require("telescope.themes").get_dropdown {
+					winblend = 10,
+					previewer = false,
+				}) end,
+			{ desc = "Find fuzzily" })
 	end
 end
 
