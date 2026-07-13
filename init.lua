@@ -47,6 +47,11 @@ do
 	vim.o.splitbelow = true
 	-- Live substitutions
 	vim.o.inccommand = "split"
+	-- Briefly highlight yanked text
+	vim.api.nvim_create_autocmd("TextYankPost", {
+		desc = "Briefly highlight yanked test",
+		callback = function() vim.hl.on_yank() end,
+	})
 end
 
 -- =======
@@ -57,9 +62,9 @@ do
 	vim.g.mapleader = " "
 	vim.g.maplocalleader = " "
 	-- Clear search highlights on Esc
-	vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
+	vim.keymap.set("n", "<Esc>", "<Cmd>nohlsearch<CR>")
 	-- Create a new tab
-	vim.keymap.set("n", "<leader>t", "<cmd>tabnew<CR>",
+	vim.keymap.set("n", "<Leader>t", "<Cmd>tabnew<CR>",
 		{ desc = "New [T]ab" })
 	-- Easy exit terminal
 	vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>",
@@ -73,11 +78,6 @@ do
 		{ desc = "Move focus to the lower window" })
 	vim.keymap.set("n", "<C-k>", "<C-w><C-k>",
 		{ desc = "Move focus to the upper window" })
-	-- Briefly highlight yanked text
-	vim.api.nvim_create_autocmd("TextYankPost", {
-		desc = "Briefly highlight yanked test",
-		callback = function() vim.hl.on_yank() end,
-	})
 end
 
 -- =======
@@ -86,24 +86,15 @@ end
 -- Helper function for Github repos
 local function gh(repo) return "https://github.com/" .. repo end
 do
-	-- Guess indentation
-	vim.pack.add { gh "NMAC427/guess-indent.nvim" }
-	require("guess-indent").setup {}
 	-- Git signs
 	vim.pack.add { gh "lewis6991/gitsigns.nvim" }
 	require("gitsigns")
+	-- Guess indentation
+	vim.pack.add { gh "NMAC427/guess-indent.nvim" }
+	require("guess-indent").setup {}
 	-- Indentation guides
 	vim.pack.add { gh "lukas-reineke/indent-blankline.nvim" }
 	require("ibl").setup {}
-	-- Display keymaps
-	vim.pack.add { gh "folke/which-key.nvim" }
-	require("which-key").setup {
-		delay = 0,
-		icons = { mappings = vim.g.have_nerd_font },
-		spec = {
-			{ "<leader>f", group = "[F]ind", mode = { "n", "v" } },
-		}
-	}
 	-- Colorscheme
 	vim.pack.add { gh "folke/tokyonight.nvim" }
 	require("tokyonight").setup {}
@@ -111,17 +102,38 @@ do
 	-- Comment highlighting
 	vim.pack.add { gh "folke/todo-comments.nvim" }
 	require("todo-comments").setup { signs = false }
+	-- Display keymaps
+	vim.pack.add { gh "folke/which-key.nvim" }
+	require("which-key").setup {
+		delay = 0,
+		icons = { mappings = vim.g.have_nerd_font },
+		spec = {
+			{ "<Leader>f", group = "[F]ind", mode = { "n", "v" } },
+		}
+	}
+	-- Quickfix improved
+	vim.pack.add { gh "stevearc/quicker.nvim" }
+	require("quicker").setup {}
+	vim.keymap.set("n", "<C-q>", function() require("quicker").toggle() end,
+		{ desc = "Toggle [Q]uickfix" })
 	-- MINI.NVIM
 	vim.pack.add { gh "nvim-mini/mini.nvim" }
 	require("mini.icons").setup {}
-	require("mini.ai").setup {}
-	require("mini.surround").setup {}
 	require("mini.statusline").setup {}
+	require("mini.pick").setup {}
+	vim.keymap.set("n", "<Leader>ff", "<Cmd>Pick files<CR>",
+		{ desc = "[F]ind [F]iles" })
+	vim.keymap.set("n", "<Leader>fg", "<Cmd>Pick grep_live<CR>",
+		{ desc = "[F]ind by [G]rep" })
+	vim.keymap.set("n", "<Leader>fb", "<Cmd>Pick buffers<CR>",
+		{ desc = "[F]ind [B]uffers" })
+	vim.keymap.set("n", "<Leader>fr", "<Cmd>Pick resume<CR>",
+		{ desc = "[F]ind [R]esume" })
 end
 
--- ======
--- PARSER
--- ======
+-- =======
+-- PARSERS
+-- =======
 do
 	vim.pack.add { gh "nvim-treesitter/nvim-treesitter" }
 	local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 
@@ -157,68 +169,16 @@ do
 	})
 end
 
--- ======
--- PICKER
--- ======
-do
-	local telescope_plugins = {
-		gh "nvim-lua/plenary.nvim",
-		gh "nvim-telescope/telescope.nvim",
-		gh "nvim-telescope/telescope-ui-select.nvim",
-		gh "nvim-telescope/telescope-live-grep-args.nvim",
-	}
-	if vim.fn.executable 'make' == 1 then
-		table.insert(telescope_plugins,
-			gh "nvim-telescope/telescope-fzf-native.nvim")
-	end
-	vim.pack.add(telescope_plugins)
-	require("telescope").setup {
-		extensions = {
-			live_grep_args = { autoquoting = true },
-		}
-	}
-	pcall(require("telescope").load_extension, "fzf")
-	pcall(require("telescope").load_extension, "ui-select")
-	pcall(require("telescope").load_extension, "live_grep_args")
-	do
-		local builtin = require "telescope.builtin"
-		vim.keymap.set("n", "<leader>ff", builtin.find_files,
-			{ desc = "[F]ind [F]iles" })
-		vim.keymap.set("n", "<leader>fg", builtin.live_grep,
-			{ desc = "[F]ind by [G]rep" })
-		vim.keymap.set("n", "<leader>fr", builtin.resume,
-			{ desc = "[F]ind [R]esume" })
-		vim.keymap.set("n", "<leader>fb", builtin.buffers,
-			{ desc = "[F]ind [B]uffer" })
-		vim.keymap.set("n", "<leader>fa", function()
-			require("telescope").extensions.live_grep_args.live_grep_args() end,
-			{ desc = "[F]ind by Grep with [A]rgs" })
-		vim.keymap.set("n", "<leader>f/", function()
-			builtin.live_grep {
-				grep_open_files = true,
-				prompt_title = "Live Grep in Open Buffers"
-			} end,
-			{ desc = "[F]ind by Grep in Buffers" })
-		vim.keymap.set("n", "<leader>/", function()
-			builtin.current_buffer_fuzzy_find(
-				require("telescope.themes").get_dropdown {
-					winblend = 10,
-					previewer = false,
-				}) end,
-			{ desc = "Find fuzzily" })
-	end
-end
-
--- ====
--- TREE 
--- ====
+-- ==========
+-- FILESYSTEM
+-- ==========
 do
 	vim.pack.add { 
 		{ src = gh "nvim-neo-tree/neo-tree.nvim" },
 		gh "nvim-lua/plenary.nvim",
 		gh "MunifTanjim/nui.nvim",
 	}
-	vim.keymap.set("n", "\\", "<cmd>Neotree reveal<CR>",
+	vim.keymap.set("n", "\\", "<Cmd>Neotree reveal<CR>",
 		{ desc = "NeoTree reveal", silent = true })
 	require("neo-tree").setup {
 		filesystem = {
@@ -245,15 +205,15 @@ do
 	vim.g.slime_dont_ask_default = nvim_in_tmux and 1 or 0
 	vim.g.slime_bracketed_paste = 1
 	vim.pack.add { gh "jpalardy/vim-slime" }
-	vim.keymap.set("x", "<leader>r", "<Plug>SlimeRegionSend",
+	vim.keymap.set("x", "<Leader>r", "<Plug>SlimeRegionSend",
 		{ desc = "[R]un region" })
-	vim.keymap.set("n", "<leader>r", "<Plug>SlimeLineSend<CR>",
+	vim.keymap.set("n", "<Leader>r", "<Plug>SlimeLineSend<CR>",
 		{ desc = "[R]un line" })
-	vim.keymap.set("n", "<leader>m", "<Plug>SlimeMotionSend",
+	vim.keymap.set("n", "<Leader>m", "<Plug>SlimeMotionSend",
 		{ desc = "Run [M]otion" })
-	vim.keymap.set("n", "<leader>p", "<Plug>SlimeParagraphSend",
+	vim.keymap.set("n", "<Leader>p", "<Plug>SlimeParagraphSend",
 		{ desc = "Run [P]aragraph" })
-	vim.keymap.set("n", "<leader>c", "<Plug>SlimeConfig",
-		{ desc = "[C]onfigure tmux target" })
+	vim.keymap.set("n", "<Leader>c", "<Plug>SlimeConfig",
+		{ desc = "[C]hoose tmux target" })
 end
 
