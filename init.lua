@@ -62,7 +62,8 @@ do
 	vim.g.mapleader = " "
 	vim.g.maplocalleader = " "
 	-- Clear search highlights on Esc
-	vim.keymap.set("n", "<Esc>", "<Cmd>nohlsearch<CR>")
+	vim.keymap.set("n", "<Esc>", "<Cmd>nohlsearch<CR>",
+		{ desc = "Clear search highlights" })
 	-- Create a new tab
 	vim.keymap.set("n", "<Leader>t", "<Cmd>tabnew<CR>",
 		{ desc = "New [T]ab" })
@@ -102,6 +103,11 @@ do
 	-- Comment highlighting
 	vim.pack.add { gh "folke/todo-comments.nvim" }
 	require("todo-comments").setup { signs = false }
+	-- Quickfix improved
+	vim.pack.add { gh "stevearc/quicker.nvim" }
+	require("quicker").setup {}
+	vim.keymap.set("n", "<C-q>", function() require("quicker").toggle() end,
+		{ desc = "Toggle Quickfix" })
 	-- Display keymaps
 	vim.pack.add { gh "folke/which-key.nvim" }
 	require("which-key").setup {
@@ -111,11 +117,6 @@ do
 			{ "<Leader>f", group = "[F]ind", mode = { "n", "v" } },
 		}
 	}
-	-- Quickfix improved
-	vim.pack.add { gh "stevearc/quicker.nvim" }
-	require("quicker").setup {}
-	vim.keymap.set("n", "<C-q>", function() require("quicker").toggle() end,
-		{ desc = "Toggle [Q]uickfix" })
 	-- MINI.NVIM
 	vim.pack.add { gh "nvim-mini/mini.nvim" }
 	require("mini.icons").setup {}
