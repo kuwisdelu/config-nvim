@@ -28,6 +28,7 @@ do
 	-- Line display
 	vim.o.cursorline = true
 	vim.o.breakindent = true
+	vim.o.linebreak = true
 	vim.o.signcolumn = "yes"
 	vim.o.scrolloff = 10
 	vim.o.list = true
