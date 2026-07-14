@@ -137,37 +137,17 @@ end
 -- PARSERS
 -- =======
 do
-	vim.pack.add { gh "nvim-treesitter/nvim-treesitter" }
-	local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 
+	vim.pack.add { { src = gh "nvim-treesitter/nvim-treesitter" } }
+	local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc',
 		'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
 	require("nvim-treesitter").install(parsers)
-	local available = require("nvim-treesitter").get_available()
-	-- Try attaching parser
-	local function treesitter_try_attach(buf, language)
-		if not vim.treesitter.language.add(language) then return end
-		vim.treesitter.start(buf, language)
-	end
-	-- Tree installing and attaching parser
-	local function treesitter_try_install_attach(buf, language)
-		require("tree-sitter").install(language):await(
-			function() treesitter_try_attach(buf, language) end)
-	end
 	vim.api.nvim_create_autocmd("FileType", {
 		callback = function(args)
-			local buf, filetype = args.buf, args.match
-			local language = vim.treesitter.language.get_lang(filetype)
-			if not language then
-				return
+			local lang = vim.treesitter.language.get_lang(args.match)
+			if lang and vim.treesitter.language.add(lang) then
+				vim.treesitter.start(args.buf, lang)
 			end
-			local installed = require("nvim-treesitter").get_installed "parsers"
-			if vim.tbl_contains(installed, language) then
-				treesitter_try_attach(buf, language)
-			elseif vim.tbl_contains(available, language) then
-				treesitter_try_install_attach(buf, language)
-			else
-				treesitter_try_attach(buf, language)
-			end
-		end
+		end,
 	})
 end
 
