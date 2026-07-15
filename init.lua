@@ -94,7 +94,7 @@ do
 	require("mini.statusline").setup {}
 	require("mini.files").setup {
 		mappings = { 
-			close = "<Esc>",
+			close = "q",
 			go_in_plus = "<CR>",
 			go_out_plus = "<BS>",
 			reset = "Q",
