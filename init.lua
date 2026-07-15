@@ -2,7 +2,7 @@
 -- NEOVIM CONFIG
 -- by kuwisdelu
 -- =============
--- NOTE: requires ripgrep, fd, fzf, tree-sitter-cli
+-- NOTE: install ripgrep, fd, fzf, tree-sitter-cli
 
 -- =======
 -- OPTIONS
@@ -68,9 +68,6 @@ do
 	-- Create a new tab
 	vim.keymap.set("n", "<Leader>t", "<Cmd>tabnew<CR>",
 		{ desc = "New [T]ab" })
-	-- Easy exit terminal
-	vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>",
-		{ desc = "Exit terminal mode" })
 	-- Easy split navigation
 	vim.keymap.set("n", "<C-h>", "<C-w><C-h>",
 		{ desc = "Move focus to the left window" })
@@ -80,6 +77,9 @@ do
 		{ desc = "Move focus to the lower window" })
 	vim.keymap.set("n", "<C-k>", "<C-w><C-k>",
 		{ desc = "Move focus to the upper window" })
+	-- Easy exit terminal
+	vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>",
+		{ desc = "Exit terminal mode" })
 end
 
 -- =======
@@ -88,15 +88,39 @@ end
 -- Helper function for Github repos
 local function gh(repo) return "https://github.com/" .. repo end
 do
+	-- MINI.NVIM
+	vim.pack.add { gh "nvim-mini/mini.nvim" }
+	require("mini.icons").setup {}
+	require("mini.statusline").setup {}
+	require("mini.files").setup {
+		mappings = { 
+			close = "<Esc>",
+			go_in_plus = "<CR>",
+			go_out_plus = "<BS>",
+			reset = "Q",
+		},
+	}
+	vim.keymap.set("n", "\\", function() 
+		if not MiniFiles.close() then MiniFiles.open() end end,
+		{ desc = "Toggle files" })
+	require("mini.pick").setup {}
+	vim.keymap.set("n", "<Leader>ff", "<Cmd>Pick files<CR>",
+		{ desc = "[F]ind [F]iles" })
+	vim.keymap.set("n", "<Leader>fg", "<Cmd>Pick grep_live<CR>",
+		{ desc = "[F]ind by [G]rep" })
+	vim.keymap.set("n", "<Leader>fb", "<Cmd>Pick buffers<CR>",
+		{ desc = "[F]ind [B]uffers" })
+	vim.keymap.set("n", "<Leader>fr", "<Cmd>Pick resume<CR>",
+		{ desc = "[F]ind [R]esume" })
 	-- Git signs
 	vim.pack.add { gh "lewis6991/gitsigns.nvim" }
 	require("gitsigns")
-	-- Guess indentation
-	vim.pack.add { gh "NMAC427/guess-indent.nvim" }
-	require("guess-indent").setup {}
 	-- Indentation guides
 	vim.pack.add { gh "lukas-reineke/indent-blankline.nvim" }
 	require("ibl").setup {}
+	-- Guess indentation
+	vim.pack.add { gh "NMAC427/guess-indent.nvim" }
+	require("guess-indent").setup {}
 	-- Colorscheme
 	vim.pack.add { gh "folke/tokyonight.nvim" }
 	require("tokyonight").setup {}
@@ -118,19 +142,6 @@ do
 			{ "<Leader>f", group = "[F]ind", mode = { "n", "v" } },
 		}
 	}
-	-- MINI.NVIM
-	vim.pack.add { gh "nvim-mini/mini.nvim" }
-	require("mini.icons").setup {}
-	require("mini.statusline").setup {}
-	require("mini.pick").setup {}
-	vim.keymap.set("n", "<Leader>ff", "<Cmd>Pick files<CR>",
-		{ desc = "[F]ind [F]iles" })
-	vim.keymap.set("n", "<Leader>fg", "<Cmd>Pick grep_live<CR>",
-		{ desc = "[F]ind by [G]rep" })
-	vim.keymap.set("n", "<Leader>fb", "<Cmd>Pick buffers<CR>",
-		{ desc = "[F]ind [B]uffers" })
-	vim.keymap.set("n", "<Leader>fr", "<Cmd>Pick resume<CR>",
-		{ desc = "[F]ind [R]esume" })
 end
 
 -- =======
@@ -153,25 +164,44 @@ end
 
 -- ==========
 -- FILESYSTEM
--- ==========
+-- =========
 do
-	vim.pack.add { 
-		{ src = gh "nvim-neo-tree/neo-tree.nvim" },
-		gh "nvim-lua/plenary.nvim",
-		gh "MunifTanjim/nui.nvim",
-	}
-	vim.keymap.set("n", "\\", "<Cmd>Neotree reveal<CR>",
-		{ desc = "NeoTree reveal", silent = true })
-	require("neo-tree").setup {
-		filesystem = {
-			window = {
-				mappings = {
-					["\\"] = "close_window",
-				},
-			},
-		}
-	}
+	local show_dotfiles = true
+	local filter_show = function(fs_entry) return true end
+	local filter_hide = function(fs_entry)
+		return not vim.startswith(fs_entry.name, '.')
+	end
+	local toggle_dotfiles = function()
+		show_dotfiles = not show_dotfiles
+		local new_filter = show_dotfiles and filter_show or filter_hide
+		MiniFiles.refresh({ content = { filter = new_filter } })
+	end
+	vim.api.nvim_create_autocmd('User', {
+		pattern = 'MiniFilesBufferCreate',
+		callback = function(args)
+			local buf_id = args.data.buf_id
+			vim.keymap.set('n', 'g.', toggle_dotfiles, { buffer = buf_id })
+		end,
+	})
 end
+-- do
+-- 	vim.pack.add { 
+-- 		{ src = gh "nvim-neo-tree/neo-tree.nvim" },
+-- 		gh "nvim-lua/plenary.nvim",
+-- 		gh "MunifTanjim/nui.nvim",
+-- 	}
+-- 	vim.keymap.set("n", "\\", "<Cmd>Neotree reveal<CR>",
+-- 		{ desc = "NeoTree reveal", silent = true })
+-- 	require("neo-tree").setup {
+-- 		filesystem = {
+-- 			window = {
+-- 				mappings = {
+-- 					["\\"] = "close_window",
+-- 				},
+-- 			},
+-- 		}
+-- 	}
+-- end
 
 -- ====
 -- REPL
