@@ -2,7 +2,7 @@
 -- NEOVIM CONFIG
 -- by kuwisdelu
 -- =============
--- NOTE: install ripgrep, fd, fzf, tree-sitter-cli
+-- NOTE: install ripgrep, fd, git, tree-sitter, tree-sitter-cli
 
 -- =======
 -- OPTIONS
@@ -137,10 +137,11 @@ do
 	-- Display keymaps
 	vim.pack.add { gh "folke/which-key.nvim" }
 	require("which-key").setup {
+		preset = "helix",
 		delay = 0,
 		icons = { mappings = vim.g.have_nerd_font },
 		spec = {
-			{ "<Leader>f", group = "[F]ind", mode = { "n", "v" } },
+			{ "<Leader>f", group = "[F]ind", mode = "n" },
 		}
 	}
 end
