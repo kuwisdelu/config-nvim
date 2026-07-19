@@ -111,14 +111,19 @@ do
 		if not MiniFiles.close() then MiniFiles.open() end end,
 		{ desc = "Toggle files" })
 	require("mini.pick").setup {}
-	vim.keymap.set("n", "<Leader>ff", "<Cmd>Pick files<CR>",
+	vim.keymap.set("n", "<Leader>ff", MiniPick.builtin.files,
 		{ desc = "[F]ind [F]iles" })
-	vim.keymap.set("n", "<Leader>fg", "<Cmd>Pick grep_live<CR>",
+	vim.keymap.set("n", "<Leader>fg", MiniPick.builtin.grep_live,
 		{ desc = "[F]ind by [G]rep" })
-	vim.keymap.set("n", "<Leader>fb", "<Cmd>Pick buffers<CR>",
+	vim.keymap.set("n", "<Leader>fb", MiniPick.builtin.buffers,
 		{ desc = "[F]ind [B]uffers" })
-	vim.keymap.set("n", "<Leader>fr", "<Cmd>Pick resume<CR>",
+	vim.keymap.set("n", "<Leader>fr", MiniPick.builtin.resume,
 		{ desc = "[F]ind [R]esume" })
+	require("mini.map").setup {
+		window = { winblend = 50 },
+	}
+	vim.keymap.set("n", "<Leader>m", MiniMap.toggle,
+		{ desc = "[M]ap view of buffer" })
 	-- Guess indentation
 	vim.pack.add { gh "NMAC427/guess-indent.nvim" }
 	require("guess-indent").setup {}
@@ -178,12 +183,12 @@ do
 	vim.g.slime_dont_ask_default = nvim_in_tmux and 1 or 0
 	vim.g.slime_bracketed_paste = 1
 	vim.pack.add { gh "jpalardy/vim-slime" }
-	vim.keymap.set("x", "<Leader>r", "<Plug>SlimeRegionSend",
-		{ desc = "[R]un region" })
-	vim.keymap.set("n", "<Leader>r", "<Plug>SlimeLineSend<CR>",
-		{ desc = "[R]un line" })
-	vim.keymap.set("n", "<Leader>m", "<Plug>SlimeMotionSend",
-		{ desc = "Run [M]otion" })
+	vim.keymap.set("x", "<Leader><CR>", "<Plug>SlimeRegionSend",
+		{ desc = "Run region" })
+	vim.keymap.set("n", "<Leader><CR>", "<Plug>SlimeLineSend<CR>",
+		{ desc = "Run line" })
+	vim.keymap.set("n", "<Leader>r", "<Plug>SlimeMotionSend",
+		{ desc = "[R]un motion" })
 	vim.keymap.set("n", "<Leader>p", "<Plug>SlimeParagraphSend",
 		{ desc = "Run [P]aragraph" })
 	vim.keymap.set("n", "<Leader>c", "<Plug>SlimeConfig",
